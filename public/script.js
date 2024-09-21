@@ -119,4 +119,63 @@ document.addEventListener("DOMContentLoaded", () => {
     // Recargar la página para evitar duplicados y actualizar los datos
     window.location.reload();
   });
+
+  function addRestaurantToList(restaurant) {
+    const tr = document.createElement("tr");
+
+    // Columna para nombre del restaurante
+    const nameTd = document.createElement("td");
+    nameTd.textContent = restaurant.nombre;
+
+    // Columna para el dropdown de sucursales
+    const sucursalesTd = document.createElement("td");
+    const dropdownSucursales = document.createElement("select");
+    restaurant.sucursales.forEach((sucursal) => {
+      const option = document.createElement("option");
+      option.value = sucursal;
+      option.textContent = sucursal;
+      dropdownSucursales.appendChild(option);
+    });
+    sucursalesTd.appendChild(dropdownSucursales);
+
+    // Columna para el dropdown de platos
+    const platosTd = document.createElement("td");
+    const dropdownPlatos = document.createElement("select");
+    restaurant.platos.forEach((plato) => {
+      const option = document.createElement("option");
+      option.value = plato.nombre;
+      option.textContent = `${plato.nombre} - ${plato.precio} USD (${plato.porcion})`;
+      dropdownPlatos.appendChild(option);
+    });
+    platosTd.appendChild(dropdownPlatos);
+
+    // Columna para botones de acciones
+    const actionsTd = document.createElement("td");
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Eliminar";
+    deleteButton.className = "delete-btn";
+    deleteButton.onclick = async () => {
+      await fetch(`/api/restaurantes/${restaurant._id}`, { method: "DELETE" });
+      tr.remove();
+    };
+
+    const addPlatoButton = document.createElement("button");
+    addPlatoButton.textContent = "Agregar Plato";
+    addPlatoButton.onclick = () => {
+      currentRestaurantId = restaurant._id;
+      modal.style.display = "block";
+    };
+
+    actionsTd.appendChild(addPlatoButton);
+    actionsTd.appendChild(deleteButton);
+
+    // Añadir columnas a la fila
+    tr.appendChild(nameTd);
+    tr.appendChild(sucursalesTd);
+    tr.appendChild(platosTd);
+    tr.appendChild(actionsTd);
+
+    // Añadir fila a la tabla
+    restaurantList.appendChild(tr);
+  }
 });

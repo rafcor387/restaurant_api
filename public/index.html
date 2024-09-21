@@ -9,14 +9,13 @@
   </head>
   <body>
     <div class="container">
-      <h1>Administrar Restaurantes</h1>
+      <h1>Restaurantes</h1>
 
-      <!-- Formulario para añadir un nuevo restaurante -->
       <form id="restaurant-form">
         <input
           type="text"
           id="nombre"
-          placeholder="Nombre del Restaurante"
+          placeholder="Nombre del restaurante"
           required
         />
         <input
@@ -28,9 +27,19 @@
         <button type="submit">Añadir Restaurante</button>
       </form>
 
-      <!-- Lista de restaurantes -->
-      <h2>Lista de Restaurantes</h2>
-      <ul id="restaurant-list"></ul>
+      <table id="restaurant-table">
+        <thead>
+          <tr>
+            <th>Nombre del Restaurante</th>
+            <th>Sucursales</th>
+            <th>Platos</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody id="restaurant-list">
+          <!-- Aquí se añadirán dinámicamente las filas de los restaurantes -->
+        </tbody>
+      </table>
     </div>
 
     <!-- Modal para agregar plato -->
