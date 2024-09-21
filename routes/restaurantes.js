@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Restaurant = require("../models/Restaurant");
-const mongoose = require("mongoose");
+//const mongoose = require("mongoose");
 
 // Obtener todos los restaurantes
 router.get("/", async (req, res) => {
@@ -17,7 +17,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const { nombre, sucursales, platos } = req.body;
   try {
-    const newRestaurant = new Restaurant({ nombre, sucursales, platos });
+    const newRestaurant = new Restaurant(req.body);
     const restaurant = await newRestaurant.save();
     res.status(201).json(restaurant);
   } catch (err) {
@@ -47,9 +47,10 @@ router.put("/:id", async (req, res) => {
 // Eliminar un restaurante
 router.delete("/:id", async (req, res) => {
   try {
+    /*
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ msg: "ID inválido" });
-    }
+    }*/
     const restaurant = await Restaurant.findById(req.params.id);
     if (!restaurant) {
       return res.status(404).json({ msg: "Restaurante no encontrado" });
@@ -66,9 +67,11 @@ router.post("/:id/platos", async (req, res) => {
   const { nombre, descripcion, precio, porcion } = req.body;
 
   try {
+    /*
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ msg: "ID inválido" });
     }
+      */
 
     const restaurant = await Restaurant.findById(req.params.id);
     if (!restaurant) {
