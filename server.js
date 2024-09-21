@@ -1,27 +1,26 @@
-// server.js
 const express = require('express');
 const connectDB = require('./db');
-const cors = require('cors');
+const path = require('path');
 
 const app = express();
-
-
 
 // Conectar a la base de datos
 connectDB();
 
-app.use(cors());
+// Middleware para servir archivos estáticos
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Middleware para parsear JSON
+// Middleware para analizar el cuerpo de las solicitudes
 app.use(express.json());
 
-//servir archivos estaticos desde la carpeta public
+// Servir archivos estáticos de la carpeta "public"
 app.use(express.static('public'));
 
-
-// Definir rutas
-app.use('/api/restaurantes', require('./routes/restaurantes'));
+// Rutas
+app.use('/api/restaurantes', require('./routes/restaurantes')); // Importa las rutas desde el archivo de rutas
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`Servidor corriendo en el puerto ${PORT}`);
+});

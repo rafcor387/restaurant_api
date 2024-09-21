@@ -1,4 +1,3 @@
-// routes/restaurantes.js
 const express = require("express");
 const router = express.Router();
 const Restaurant = require("../models/Restaurant");
@@ -18,14 +17,9 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const { nombre, sucursales, platos } = req.body;
   try {
-    const newRestaurant = new Restaurant({
-      nombre,
-      sucursales,
-      platos,
-    });
-
+    const newRestaurant = new Restaurant({ nombre, sucursales, platos });
     const restaurant = await newRestaurant.save();
-    res.json(restaurant);
+    res.status(201).json(restaurant);
   } catch (err) {
     res.status(500).send("Server Error");
   }
@@ -41,7 +35,7 @@ router.put("/:id", async (req, res) => {
 
     restaurant.nombre = nombre;
     restaurant.sucursales = sucursales;
-    restaurant.platos = platos;
+    restaurant.platos = platos; // Puedes actualizar todos los platos
 
     await restaurant.save();
     res.json(restaurant);
@@ -53,56 +47,35 @@ router.put("/:id", async (req, res) => {
 // Eliminar un restaurante
 router.delete("/:id", async (req, res) => {
   try {
-    // Verifica si el ID es válido
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ msg: "ID inválido" });
     }
-
     const restaurant = await Restaurant.findById(req.params.id);
     if (!restaurant) {
       return res.status(404).json({ msg: "Restaurante no encontrado" });
     }
-
-    // Utilizar deleteOne para eliminar el restaurante
     await Restaurant.deleteOne({ _id: req.params.id });
     res.json({ msg: "Restaurante eliminado" });
   } catch (err) {
-    console.error("Error en la operación DELETE:", err.message);
     res.status(500).send("Server Error");
   }
 });
 
-//otra cosa--------------------------------------------------------------------------
-// Añadir un plato a una sucursal específica
+// Añadir un plato a un restaurante específico
 router.post("/:id/platos", async (req, res) => {
-  const { nombre, descripcion, precio, porcion, sucursal } = req.body;
+  const { nombre, descripcion, precio, porcion } = req.body;
 
   try {
-    // Verifica si el ID es válido
     if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ msg: "ID inválido" });
     }
 
-    // Buscar el restaurante por ID
     const restaurant = await Restaurant.findById(req.params.id);
     if (!restaurant) {
       return res.status(404).json({ msg: "Restaurante no encontrado" });
     }
 
-    // Verifica si la sucursal existe
-    if (!restaurant.sucursales.includes(sucursal)) {
-      return res.status(404).json({ msg: "Sucursal no encontrada" });
-    }
-
-    // Crear nuevo plato
-    const newPlate = {
-      nombre,
-      descripcion,
-      precio,
-      porcion,
-    };
-
-    // Agregar el plato al restaurante
+    const newPlate = { nombre, descripcion, precio, porcion };
     restaurant.platos.push(newPlate);
     await restaurant.save();
 
@@ -112,35 +85,22 @@ router.post("/:id/platos", async (req, res) => {
     res.status(500).send("Server Error");
   }
 });
-// Obtener los platos de una sucursal específica
-router.get("/:id/platos/:sucursal", async (req, res) => {
-  const { id, sucursal } = req.params;
+
+// Eliminar un plato específico de un restaurante
+router.delete("/:id/platos/:platoId", async (req, res) => {
+  const { id, platoId } = req.params;
 
   try {
-    // Verifica si el ID es válido
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({ msg: "ID inválido" });
-    }
-
     const restaurant = await Restaurant.findById(id);
     if (!restaurant) {
       return res.status(404).json({ msg: "Restaurante no encontrado" });
     }
 
-    // Verifica si la sucursal existe
-    if (!restaurant.sucursales.includes(sucursal)) {
-      return res.status(404).json({ msg: "Sucursal no encontrada" });
-    }
+    restaurant.platos.id(platoId).remove(); // Eliminar el plato por ID
+    await restaurant.save();
 
-    // Filtrar los platos por sucursal (asumiendo que cada plato tiene una propiedad de sucursal)
-    // Nota: Asegúrate de que tu esquema de platos incluye una propiedad para la sucursal si aún no la tiene.
-    const platos = restaurant.platos.filter(
-      (plato) => plato.sucursal === sucursal
-    );
-
-    res.json(platos);
+    res.json(restaurant);
   } catch (err) {
-    console.error("Error al obtener los platos:", err.message);
     res.status(500).send("Server Error");
   }
 });

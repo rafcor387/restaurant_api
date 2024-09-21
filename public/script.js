@@ -1,146 +1,122 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const restaurantList = document.getElementById('restaurant-list');
-    const restaurantForm = document.getElementById('restaurant-form');
-    const modal = document.getElementById('modal');
-    const closeModal = document.getElementById('close-modal');
-    const plateForm = document.getElementById('plate-form');
-    const plateList = document.getElementById('plate-list'); // Agrega un contenedor para los platos
-    let currentRestaurantId = null;
-    let currentSucursal = null;
+document.addEventListener("DOMContentLoaded", () => {
+  const restaurantList = document.getElementById("restaurant-list");
+  const restaurantForm = document.getElementById("restaurant-form");
+  const modal = document.getElementById("modal");
+  const closeModalBtn = document.querySelector(".close");
+  let currentRestaurantId = null; // Variable para guardar el ID del restaurante seleccionado para agregar plato
 
-    // Cargar todos los restaurantes al cargar la página
-    fetchRestaurants();
+  // Cargar todos los restaurantes al cargar la página
+  fetchRestaurants();
 
-    // Evento para añadir un nuevo restaurante
-    restaurantForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+  // Evento para añadir un nuevo restaurante
+  restaurantForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-        const nombre = document.getElementById('nombre').value;
-        const sucursales = document.getElementById('sucursales').value.split(',');
+    const nombre = document.getElementById("nombre").value;
+    const sucursales = document.getElementById("sucursales").value.split(",");
+    const platos = [];
 
-        const response = await fetch('/api/restaurantes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, sucursales })
-        });
-
-        const newRestaurant = await response.json();
-        addRestaurantToList(newRestaurant);
-
-        restaurantForm.reset();
+    const response = await fetch("/api/restaurantes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ nombre, sucursales, platos }),
     });
 
-    // Cargar los restaurantes
-    async function fetchRestaurants() {
-        const response = await fetch('/api/restaurantes');
-        const restaurants = await response.json();
+    const newRestaurant = await response.json();
+    addRestaurantToList(newRestaurant);
 
-        restaurants.forEach(addRestaurantToList);
-    }
+    restaurantForm.reset();
+  });
 
-    // Añadir restaurante a la lista
-    function addRestaurantToList(restaurant) {
-        const li = document.createElement('li');
-        li.textContent = restaurant.nombre;
+  // Función para cargar restaurantes
+  async function fetchRestaurants() {
+    const response = await fetch("/api/restaurantes");
+    const restaurants = await response.json();
 
-        // Dropdown para sucursales
-        const select = document.createElement('select');
-        restaurant.sucursales.forEach((sucursal) => {
-            const option = document.createElement('option');
-            option.value = sucursal;
-            option.textContent = sucursal;
-            select.appendChild(option);
-        });
+    restaurants.forEach(addRestaurantToList);
+  }
 
-        // Dropdown para añadir platos
-        const plateSelect = document.createElement('select');
-        plateSelect.disabled = true; // Inicialmente deshabilitado
+  // Función para añadir un restaurante a la lista
+  function addRestaurantToList(restaurant) {
+    const li = document.createElement("li");
+    li.textContent = restaurant.nombre;
 
-        // Botón para ver platos de una sucursal
-        const viewPlatesButton = document.createElement('button');
-        viewPlatesButton.textContent = 'Ver Platos';
-        viewPlatesButton.onclick = async () => {
-            const sucursal = select.value;
-            const response = await fetch(`/api/restaurantes/${restaurant._id}/platos/${sucursal}`);
-            const platos = await response.json();
+    // Crear dropdown para sucursales
+    const dropdownSucursales = document.createElement("select");
+    restaurant.sucursales.forEach((sucursal) => {
+      const option = document.createElement("option");
+      option.value = sucursal;
+      option.textContent = sucursal;
+      dropdownSucursales.appendChild(option);
+    });
 
-            // Mostrar los platos en la lista
-            plateList.innerHTML = ''; // Limpiar lista de platos
-            platos.forEach(plato => {
-                const plateItem = document.createElement('li');
-                plateItem.textContent = `${plato.nombre}: ${plato.descripcion} - ${plato.precio} (${plato.porcion})`;
-                plateList.appendChild(plateItem);
-            });
-        };
+    // Crear dropdown para platos
+    const dropdownPlatos = document.createElement("select");
+    restaurant.platos.forEach((plato) => {
+      const option = document.createElement("option");
+      option.value = plato.nombre;
+      option.textContent = `${plato.nombre} - ${plato.precio} USD (${plato.porcion})`;
+      dropdownPlatos.appendChild(option);
+    });
 
-        // Actualizar platos cuando se cambia la sucursal
-        select.onchange = async () => {
-            currentSucursal = select.value; // Guardar sucursal seleccionada
-            plateSelect.disabled = false;
-
-            // Obtener platos de la sucursal seleccionada
-            const response = await fetch(`/api/restaurantes/${restaurant._id}/platos/${currentSucursal}`);
-            const platos = await response.json();
-
-            // Limpiar y actualizar dropdown de platos
-            plateSelect.innerHTML = '';
-            platos.forEach(plato => {
-                const option = document.createElement('option');
-                option.value = plato._id;
-                option.textContent = `${plato.nombre}: ${plato.descripcion} - ${plato.precio} (${plato.porcion})`;
-                plateSelect.appendChild(option);
-            });
-        };
-
-        // Botón para agregar plato
-        const addPlateButton = document.createElement('button');
-        addPlateButton.textContent = 'Agregar Plato';
-        addPlateButton.onclick = () => {
-            currentRestaurantId = restaurant._id;
-            modal.style.display = 'block';
-        };
-
-        // Botón para eliminar restaurante
-        const deleteButton = document.createElement('button');
-        deleteButton.textContent = 'Eliminar';
-        deleteButton.className = 'delete-btn';
-        deleteButton.onclick = async () => {
-            await fetch(`/api/restaurantes/${restaurant._id}`, { method: 'DELETE' });
-            li.remove();
-        };
-
-        li.appendChild(select);
-        li.appendChild(viewPlatesButton); // Agregar botón para ver platos
-        li.appendChild(plateSelect); // Dropdown para agregar platos
-        li.appendChild(addPlateButton);
-        li.appendChild(deleteButton);
-        restaurantList.appendChild(li);
-    }
-
-    // Cerrar modal
-    closeModal.onclick = () => {
-        modal.style.display = 'none';
+    // Botón para eliminar el restaurante
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "Eliminar";
+    deleteButton.className = "delete-btn";
+    deleteButton.onclick = async () => {
+      await fetch(`/api/restaurantes/${restaurant._id}`, { method: "DELETE" });
+      li.remove();
     };
 
-    // Evento para añadir un plato
-    plateForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    // Botón para agregar plato
+    const addPlatoButton = document.createElement("button");
+    addPlatoButton.textContent = "Agregar Plato";
+    addPlatoButton.onclick = () => {
+      currentRestaurantId = restaurant._id; // Guardamos el ID del restaurante
+      modal.style.display = "block"; // Mostramos el modal
+    };
 
-        const nombre = document.getElementById('nombre-plato').value;
-        const descripcion = document.getElementById('descripcion-plato').value;
-        const precio = document.getElementById('precio-plato').value;
-        const porcion = document.getElementById('porcion-plato').value;
+    li.appendChild(dropdownSucursales);
+    li.appendChild(dropdownPlatos);
+    li.appendChild(addPlatoButton);
+    li.appendChild(deleteButton);
+    restaurantList.appendChild(li);
+  }
 
-        const response = await fetch(`/api/restaurantes/${currentRestaurantId}/platos`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ nombre, descripcion, precio, porcion, sucursal: currentSucursal })
-        });
+  // Cerrar el modal
+  closeModalBtn.onclick = () => {
+    modal.style.display = "none";
+  };
 
-        const updatedRestaurant = await response.json();
+  // Cuando el usuario hace clic fuera del modal, cerrarlo
+  window.onclick = (event) => {
+    if (event.target == modal) {
+      modal.style.display = "none";
+    }
+  };
 
-        // Actualizar la UI si es necesario
-        modal.style.display = 'none';
-        plateForm.reset();
+  // Evento para añadir un plato desde el modal
+  const platoForm = document.getElementById("plato-form");
+  platoForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const nombre = document.getElementById("plato-nombre").value;
+    const descripcion = document.getElementById("plato-descripcion").value;
+    const precio = document.getElementById("plato-precio").value;
+    const porcion = document.getElementById("plato-porcion").value;
+
+    const nuevoPlato = { nombre, descripcion, precio, porcion };
+
+    await fetch(`/api/restaurantes/${currentRestaurantId}/platos`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(nuevoPlato),
     });
+
+    // Cerrar el modal
+    modal.style.display = "none";
+
+    // Recargar la página para evitar duplicados y actualizar los datos
+    window.location.reload();
+  });
 });

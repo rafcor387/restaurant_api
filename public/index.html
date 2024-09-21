@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>CRUD Restaurante</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <div class="container">
@@ -31,21 +31,40 @@
       <!-- Lista de restaurantes -->
       <h2>Lista de Restaurantes</h2>
       <ul id="restaurant-list"></ul>
-
-      <div id="modal" class="modal">
-        <div class="modal-content">
-            <span id="close-modal" class="close">&times;</span>
-            <h2>Agregar Plato</h2>
-            <form id="plate-form">
-                <input type="text" id="nombre-plato" placeholder="Nombre del Plato" required>
-                <input type="text" id="descripcion-plato" placeholder="Descripción" required>
-                <input type="number" id="precio-plato" placeholder="Precio" required>
-                <input type="text" id="porcion-plato" placeholder="Porción" required>
-                <button type="submit">Agregar Plato</button>
-            </form>
-        </div>
     </div>
-    
+
+    <!-- Modal para agregar plato -->
+    <div id="modal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2>Añadir Plato</h2>
+        <form id="plato-form">
+          <input
+            type="text"
+            id="plato-nombre"
+            placeholder="Nombre del Plato"
+            required
+          />
+          <input
+            type="text"
+            id="plato-descripcion"
+            placeholder="Descripción"
+            required
+          />
+          <input
+            type="number"
+            id="plato-precio"
+            placeholder="Precio"
+            required
+          />
+          <input
+            type="text"
+            id="plato-porcion"
+            placeholder="Porción"
+            required
+          />
+          <button type="submit">Agregar Plato</button>
+        </form>
       </div>
     </div>
 
