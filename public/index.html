@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CRUD Restaurante</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Administrar Restaurantes</h1>
+
+      <!-- Formulario para añadir un nuevo restaurante -->
+      <form id="restaurant-form">
+        <input
+          type="text"
+          id="nombre"
+          placeholder="Nombre del Restaurante"
+          required
+        />
+        <input
+          type="text"
+          id="sucursales"
+          placeholder="Sucursales (separadas por comas)"
+          required
+        />
+        <button type="submit">Añadir Restaurante</button>
+      </form>
+
+      <!-- Lista de restaurantes -->
+      <h2>Lista de Restaurantes</h2>
+      <ul id="restaurant-list"></ul>
+
+      <div id="modal" class="modal">
+        <div class="modal-content">
+            <span id="close-modal" class="close">&times;</span>
+            <h2>Agregar Plato</h2>
+            <form id="plate-form">
+                <input type="text" id="nombre-plato" placeholder="Nombre del Plato" required>
+                <input type="text" id="descripcion-plato" placeholder="Descripción" required>
+                <input type="number" id="precio-plato" placeholder="Precio" required>
+                <input type="text" id="porcion-plato" placeholder="Porción" required>
+                <button type="submit">Agregar Plato</button>
+            </form>
+        </div>
+    </div>
+    
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
